@@ -129,17 +129,31 @@
   .routine .arrow{margin-left:auto; flex:0 0 auto; width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
     background:#101207; color:#fff; box-shadow:0 10px 18px rgba(10,15,0,.3);}
 
-  /* ===== filas de ejercicio ===== */
-  .exrow{display:flex; align-items:center; gap:13px; border-radius:24px; padding:13px 15px; margin-bottom:10px;}
-  .exrow .num{flex:0 0 auto; width:42px; height:42px; border-radius:15px; display:grid; place-items:center;
-    font-weight:900; font-size:15px; color:#0c2403; background:linear-gradient(145deg, rgba(57,255,20,.85), rgba(57,255,20,.45));
-    border:1px solid rgba(255,255,255,.8); box-shadow:0 0 14px rgba(57,255,20,.35), inset 0 1.5px 1px #fff;}
-  .exrow:nth-child(even) .num{background:linear-gradient(145deg, rgba(255,150,30,.9), rgba(255,115,0,.5)); color:#331a00;
-    box-shadow:0 0 14px rgba(255,115,0,.32), inset 0 1.5px 1px #fff;}
-  .exrow h5{font-size:15px; font-weight:700;}
-  .exrow p{font-size:12px; color:var(--mut); font-weight:600;}
-  .exrow .muscle{margin-left:auto; font-size:10.5px; font-weight:800; letter-spacing:1px; color:var(--green-deep);
-    border:1.5px solid rgba(35,200,80,.45); padding:5px 9px; border-radius:999px; white-space:nowrap;}
+  /* ===== filas de ejercicio: botones material tipo pastilla ===== */
+  .exrow{display:flex; align-items:center; gap:14px; border-radius:26px; padding:16px 18px; margin-bottom:12px;
+    background:#fff; border:1px solid rgba(20,23,8,.05); cursor:pointer;
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    box-shadow: inset 0 1.5px 0 #fff, inset 0 -2px 3px rgba(20,23,8,.04),
+                0 1px 2px rgba(23,28,10,.05), 0 10px 22px rgba(23,28,10,.09), 0 24px 38px rgba(23,28,10,.06);
+    transition:box-shadow .35s, transform .15s;}
+  .exrow:active{transform:scale(.985);}
+  .exrow .num{flex:0 0 auto; width:44px; height:44px; border-radius:16px; display:grid; place-items:center;
+    font-weight:900; font-size:15px; color:#0e5c1e; background:linear-gradient(160deg,#f2fdef,#dff5d2);
+    box-shadow: inset 0 1.5px 0 #fff, inset 0 -2px 3px rgba(20,60,10,.08), 0 4px 10px rgba(23,28,10,.08);}
+  .exrow:nth-child(even) .num{color:#8a4a00; background:linear-gradient(160deg,#fffaf1,#ffe8c9);}
+  .exrow h5{font-size:15.5px; font-weight:800; letter-spacing:.1px;}
+  .exrow p{font-size:12px; color:var(--mut); font-weight:600; margin-top:1px;}
+  .exrow .plus{margin-left:auto; flex:0 0 auto; width:36px; height:36px; border-radius:50%; display:grid; place-items:center;
+    color:#3c4033; background:linear-gradient(165deg,#ffffff,#eef0e8);
+    box-shadow: inset 0 1.5px 0 #fff, inset 0 -2px 3px rgba(20,23,8,.07), 0 5px 12px rgba(23,28,10,.13);
+    transition:all .35s;}
+  .exrow .plus svg{width:17px; height:17px;}
+  .exrow.sel{border-color:rgba(255,170,60,.55);
+    box-shadow: inset 0 1.5px 0 #fff, inset 0 -2px 3px rgba(20,23,8,.04),
+                0 1px 2px rgba(23,28,10,.05), 0 12px 24px rgba(23,28,10,.09), 0 22px 40px rgba(255,130,0,.20);}
+  .exrow.sel .plus{color:#5b2d00; background:radial-gradient(circle at 50% 42%, #ffe1ae, #ffab2e 72%);
+    box-shadow: 0 0 0 6px rgba(255,160,40,.16), 0 0 24px rgba(255,140,0,.8), 0 10px 20px rgba(255,120,0,.38),
+                inset 0 1.5px 1px rgba(255,255,255,.8);}
 
   /* ===== vistas ===== */
   .view{display:none;}
@@ -150,17 +164,26 @@
   nav{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom));
     width:min(412px, calc(100vw - 28px)); height:82px; border-radius:42px; z-index:50;
     display:flex; padding:8px;
-    background:linear-gradient(160deg, rgba(255,255,255,.82), rgba(255,255,255,.5));
-    -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
-    border:1px solid rgba(255,255,255,.9);
-    box-shadow: inset 0 2px 2px rgba(255,255,255,1), inset 0 -12px 24px rgba(120,140,90,.12),
-                0 22px 40px rgba(31,46,10,.20), 0 0 34px rgba(57,255,20,.12);}
+    background:linear-gradient(165deg, rgba(255,255,255,.58), rgba(255,255,255,.16) 48%, rgba(255,255,255,.36));
+    -webkit-backdrop-filter:blur(28px) saturate(210%) brightness(1.07); backdrop-filter:blur(28px) saturate(210%) brightness(1.07);
+    border:1px solid rgba(255,255,255,.55);
+    box-shadow: inset 0 1.5px 1.5px rgba(255,255,255,1), inset 0 -1px 1px rgba(255,255,255,.45),
+                inset 0 12px 20px rgba(255,255,255,.28), inset 0 -16px 28px rgba(255,255,255,.16),
+                0 24px 44px rgba(31,46,10,.22), 0 0 40px rgba(57,255,20,.14);}
+  nav::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
+    background:linear-gradient(112deg, transparent 26%, rgba(255,255,255,.38) 44%, rgba(255,255,255,.05) 57%, transparent 72%),
+               linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 46%);}
+  nav::after{content:""; position:absolute; left:26px; right:26px; top:1px; height:1.5px; z-index:0; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);}
   nav .bubble{position:absolute; top:50%; left:0; width:66px; height:66px; border-radius:50%; z-index:0;
     transform:translate(0,-50%);
-    background:linear-gradient(150deg, #6bff45, var(--green) 55%, #0db968);
-    box-shadow: inset 0 2.5px 3px rgba(255,255,255,.85), inset 0 -12px 20px rgba(0,100,40,.35),
+    background:linear-gradient(150deg, rgba(150,255,100,.95), rgba(47,232,28,.85) 55%, rgba(11,170,100,.9));
+    box-shadow: inset 0 3px 4px rgba(255,255,255,.95), inset 0 -12px 20px rgba(0,100,40,.32),
+                inset -4px -4px 10px rgba(255,255,255,.25),
                 0 14px 26px rgba(35,220,60,.5), 0 0 26px rgba(57,255,20,.55);
     transition:transform .6s cubic-bezier(.65,-0.25,.25,1.3);}
+  nav .bubble::after{content:""; position:absolute; top:7px; left:11px; width:24px; height:13px; border-radius:50%;
+    background:rgba(255,255,255,.85); filter:blur(3.5px); transform:rotate(-18deg);}
   nav .bubble.stretch{animation:squish .6s cubic-bezier(.65,-0.25,.25,1.3);}
   @keyframes squish{0%{scale:1 1} 35%{scale:1.28 .82} 70%{scale:.92 1.1} 100%{scale:1 1}}
   nav button{flex:1; position:relative; z-index:1; background:none; border:none; cursor:pointer; font-family:inherit;
@@ -381,9 +404,10 @@ function routineCard(r, i){
     <div class="chips"><span>⏱ ${r.mins} MIN</span><span class="${r.level==='INTENSO' ? 'no':'nv'}">${r.level}</span></div></div>
     <div class="arrow">${arrowSVG}</div></div></div>`;
 }
+const plusSVG = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
 function exRow(e, idx){
-  return `<div class="exrow glass"><div class="num">${String(idx+1).padStart(2,'0')}</div>
-    <div><h5>${e.name}</h5><p>${e.sets}</p></div><span class="muscle">${e.muscle}</span></div>`;
+  return `<div class="exrow" onclick="this.classList.toggle('sel')"><div class="num">${String(idx+1).padStart(2,'0')}</div>
+    <div><h5>${e.name}</h5><p>${e.sets} · ${e.muscle}</p></div><span class="plus">${plusSVG}</span></div>`;
 }
 function catPills(elId, onclickFn){
   document.getElementById(elId).innerHTML = CATS.map((c,i)=>
