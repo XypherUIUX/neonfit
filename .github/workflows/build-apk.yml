@@ -212,6 +212,14 @@ jobs:
           cp index.html android/app/src/main/assets/index.html
           find android -type f | sort
 
+      - name: Restaurar la firma fija
+        env:
+          KS_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
+        run: |
+          mkdir -p ~/.android
+          echo "$KS_B64" | base64 -d > ~/.android/debug.keystore
+          ls -l ~/.android/debug.keystore
+
       - name: Compilar APK (debug, instalable)
         working-directory: android
         run: gradle assembleDebug --no-daemon --stacktrace
