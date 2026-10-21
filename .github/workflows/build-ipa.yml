@@ -1,0 +1,385 @@
+name: Compilar IPA NEONFIT (iPhone)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'index.html'
+      - 'appicon-ios-1024.png'
+      - '.github/workflows/build-ipa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Ver la version de Xcode
+        run: xcodebuild -version
+
+      - name: Generar el proyecto iOS y meter la web
+        run: |
+          mkdir -p NeonFit/NeonFit/Assets.xcassets/AppIcon.appiconset NeonFit/NeonFit.xcodeproj
+          cp index.html NeonFit/NeonFit/index.html
+          cp appicon-ios-1024.png NeonFit/NeonFit/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+          cat > NeonFit/NeonFit/Assets.xcassets/AppIcon.appiconset/Contents.json <<'EOF_NEONFIT'
+          {
+            "images" : [
+              { "filename" : "icon-1024.png", "idiom" : "universal", "platform" : "ios", "size" : "1024x1024" }
+            ],
+            "info" : { "author" : "xcode", "version" : 1 }
+          }
+          EOF_NEONFIT
+          cat > NeonFit/NeonFit/Assets.xcassets/Contents.json <<'EOF_NEONFIT'
+          {
+            "info" : { "author" : "xcode", "version" : 1 }
+          }
+          EOF_NEONFIT
+          cat > NeonFit/NeonFit/AppDelegate.swift <<'EOF_NEONFIT'
+          import UIKit
+
+          @main
+          class AppDelegate: UIResponder, UIApplicationDelegate {
+              var window: UIWindow?
+
+              func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+                  let window = UIWindow(frame: UIScreen.main.bounds)
+                  window.rootViewController = ViewController()
+                  window.makeKeyAndVisible()
+                  self.window = window
+                  return true
+              }
+          }
+          EOF_NEONFIT
+          cat > NeonFit/NeonFit/ViewController.swift <<'EOF_NEONFIT'
+          import UIKit
+          import WebKit
+
+          class ViewController: UIViewController, WKNavigationDelegate {
+              var webView: WKWebView!
+
+              override func loadView() {
+                  let config = WKWebViewConfiguration()
+                  config.allowsInlineMediaPlayback = true
+                  webView = WKWebView(frame: .zero, configuration: config)
+                  webView.navigationDelegate = self
+                  view = webView
+              }
+
+              override func viewDidLoad() {
+                  super.viewDidLoad()
+                  view.backgroundColor = .white
+                  webView.backgroundColor = .white
+                  webView.scrollView.backgroundColor = .white
+                  webView.scrollView.contentInsetAdjustmentBehavior = .never
+                  if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
+                      webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+                  }
+              }
+
+              override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+          }
+          EOF_NEONFIT
+          cat > NeonFit/NeonFit/Info.plist <<'EOF_NEONFIT'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDisplayName</key>
+              <string>NEONFIT</string>
+              <key>CFBundleExecutable</key>
+              <string>$(EXECUTABLE_NAME)</string>
+              <key>CFBundleIdentifier</key>
+              <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+              <key>CFBundleName</key>
+              <string>$(PRODUCT_NAME)</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>$(MARKETING_VERSION)</string>
+              <key>CFBundleVersion</key>
+              <string>$(CURRENT_PROJECT_VERSION)</string>
+              <key>LSRequiresIPhoneOS</key>
+              <true/>
+              <key>UILaunchScreen</key>
+              <dict/>
+              <key>UISupportedInterfaceOrientations</key>
+              <array>
+                  <string>UIInterfaceOrientationPortrait</string>
+              </array>
+              <key>UIStatusBarStyle</key>
+              <string>UIStatusBarStyleDarkContent</string>
+              <key>UIViewControllerBasedStatusBarAppearance</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF_NEONFIT
+          cat > NeonFit/NeonFit.xcodeproj/project.pbxproj <<'EOF_NEONFIT'
+          // !$*UTF8*$!
+          {
+              archiveVersion = 1;
+              classes = {
+              };
+              objectVersion = 56;
+              objects = {
+
+          /* Begin PBXBuildFile section */
+                  888888888888888888888881 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111111111 /* AppDelegate.swift */; };
+                  888888888888888888888882 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 222222222222222222222222 /* ViewController.swift */; };
+                  888888888888888888888883 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 333333333333333333333333 /* index.html */; };
+                  888888888888888888888884 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 444444444444444444444444 /* Assets.xcassets */; };
+                  888888888888888888888885 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 777777777777777777777777 /* WebKit.framework */; };
+          /* End PBXBuildFile section */
+
+          /* Begin PBXFileReference section */
+                  111111111111111111111111 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+                  222222222222222222222222 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+                  333333333333333333333333 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+                  444444444444444444444444 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+                  555555555555555555555555 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+                  666666666666666666666666 /* NeonFit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NeonFit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+                  777777777777777777777777 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+          /* End PBXFileReference section */
+
+          /* Begin PBXFrameworksBuildPhase section */
+                  AAAAAAAAAAAAAAAA00000002 /* Frameworks */ = {
+                      isa = PBXFrameworksBuildPhase;
+                      buildActionMask = 2147483647;
+                      files = (
+                          888888888888888888888885 /* WebKit.framework in Frameworks */,
+                      );
+                      runOnlyForDeploymentPostprocessing = 0;
+                  };
+          /* End PBXFrameworksBuildPhase section */
+
+          /* Begin PBXGroup section */
+                  999999999999999999999990 = {
+                      isa = PBXGroup;
+                      children = (
+                          999999999999999999999991 /* NeonFit */,
+                          999999999999999999999992 /* Products */,
+                      );
+                      sourceTree = "<group>";
+                  };
+                  999999999999999999999991 /* NeonFit */ = {
+                      isa = PBXGroup;
+                      children = (
+                          111111111111111111111111 /* AppDelegate.swift */,
+                          222222222222222222222222 /* ViewController.swift */,
+                          333333333333333333333333 /* index.html */,
+                          444444444444444444444444 /* Assets.xcassets */,
+                          555555555555555555555555 /* Info.plist */,
+                      );
+                      path = NeonFit;
+                      sourceTree = "<group>";
+                  };
+                  999999999999999999999992 /* Products */ = {
+                      isa = PBXGroup;
+                      children = (
+                          666666666666666666666666 /* NeonFit.app */,
+                      );
+                      name = Products;
+                      sourceTree = "<group>";
+                  };
+          /* End PBXGroup section */
+
+          /* Begin PBXNativeTarget section */
+                  BBBBBBBBBBBBBBBB00000001 /* NeonFit */ = {
+                      isa = PBXNativeTarget;
+                      buildConfigurationList = EEEEEEEEEEEEEEEE00000002 /* Build configuration list for PBXNativeTarget "NeonFit" */;
+                      buildPhases = (
+                          AAAAAAAAAAAAAAAA00000001 /* Sources */,
+                          AAAAAAAAAAAAAAAA00000002 /* Frameworks */,
+                          AAAAAAAAAAAAAAAA00000003 /* Resources */,
+                      );
+                      buildRules = (
+                      );
+                      dependencies = (
+                      );
+                      name = NeonFit;
+                      productName = NeonFit;
+                      productReference = 666666666666666666666666 /* NeonFit.app */;
+                      productType = "com.apple.product-type.application";
+                  };
+          /* End PBXNativeTarget section */
+
+          /* Begin PBXProject section */
+                  CCCCCCCCCCCCCCCC00000001 /* Project object */ = {
+                      isa = PBXProject;
+                      attributes = {
+                          BuildIndependentTargetsInParallel = 1;
+                          LastSwiftUpdateCheck = 1500;
+                          LastUpgradeCheck = 1500;
+                          TargetAttributes = {
+                              BBBBBBBBBBBBBBBB00000001 = {
+                                  CreatedOnToolsVersion = 15.0;
+                              };
+                          };
+                      };
+                      buildConfigurationList = EEEEEEEEEEEEEEEE00000001 /* Build configuration list for PBXProject "NeonFit" */;
+                      compatibilityVersion = "Xcode 14.0";
+                      developmentRegion = en;
+                      hasScannedForEncodings = 0;
+                      knownRegions = (
+                          en,
+                          Base,
+                      );
+                      mainGroup = 999999999999999999999990;
+                      productRefGroup = 999999999999999999999992 /* Products */;
+                      projectDirPath = "";
+                      projectRoot = "";
+                      targets = (
+                          BBBBBBBBBBBBBBBB00000001 /* NeonFit */,
+                      );
+                  };
+          /* End PBXProject section */
+
+          /* Begin PBXResourcesBuildPhase section */
+                  AAAAAAAAAAAAAAAA00000003 /* Resources */ = {
+                      isa = PBXResourcesBuildPhase;
+                      buildActionMask = 2147483647;
+                      files = (
+                          888888888888888888888883 /* index.html in Resources */,
+                          888888888888888888888884 /* Assets.xcassets in Resources */,
+                      );
+                      runOnlyForDeploymentPostprocessing = 0;
+                  };
+          /* End PBXResourcesBuildPhase section */
+
+          /* Begin PBXSourcesBuildPhase section */
+                  AAAAAAAAAAAAAAAA00000001 /* Sources */ = {
+                      isa = PBXSourcesBuildPhase;
+                      buildActionMask = 2147483647;
+                      files = (
+                          888888888888888888888881 /* AppDelegate.swift in Sources */,
+                          888888888888888888888882 /* ViewController.swift in Sources */,
+                      );
+                      runOnlyForDeploymentPostprocessing = 0;
+                  };
+          /* End PBXSourcesBuildPhase section */
+
+          /* Begin XCBuildConfiguration section */
+                  DDDDDDDDDDDDDDDD00000001 /* Debug */ = {
+                      isa = XCBuildConfiguration;
+                      buildSettings = {
+                          ALWAYS_SEARCH_USER_PATHS = NO;
+                          IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+                          MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+                          SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+                          SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+                      };
+                      name = Debug;
+                  };
+                  DDDDDDDDDDDDDDDD00000002 /* Release */ = {
+                      isa = XCBuildConfiguration;
+                      buildSettings = {
+                          ALWAYS_SEARCH_USER_PATHS = NO;
+                          IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+                          SWIFT_COMPILATION_MODE = wholemodule;
+                      };
+                      name = Release;
+                  };
+                  DDDDDDDDDDDDDDDD00000003 /* Debug */ = {
+                      isa = XCBuildConfiguration;
+                      buildSettings = {
+                          ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                          CODE_SIGN_STYLE = Manual;
+                          CURRENT_PROJECT_VERSION = 2;
+                          GENERATE_INFOPLIST_FILE = NO;
+                          INFOPLIST_FILE = NeonFit/Info.plist;
+                          LD_RUNPATH_SEARCH_PATHS = (
+                              "$(inherited)",
+                              "@executable_path/Frameworks",
+                          );
+                          MARKETING_VERSION = 1.1;
+                          PRODUCT_BUNDLE_IDENTIFIER = com.xypher.neonfit;
+                          PRODUCT_NAME = "$(TARGET_NAME)";
+                          SWIFT_VERSION = 5.0;
+                          TARGETED_DEVICE_FAMILY = 1;
+                      };
+                      name = Debug;
+                  };
+                  DDDDDDDDDDDDDDDD00000004 /* Release */ = {
+                      isa = XCBuildConfiguration;
+                      buildSettings = {
+                          ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                          CODE_SIGN_STYLE = Manual;
+                          CURRENT_PROJECT_VERSION = 2;
+                          GENERATE_INFOPLIST_FILE = NO;
+                          INFOPLIST_FILE = NeonFit/Info.plist;
+                          LD_RUNPATH_SEARCH_PATHS = (
+                              "$(inherited)",
+                              "@executable_path/Frameworks",
+                          );
+                          MARKETING_VERSION = 1.1;
+                          PRODUCT_BUNDLE_IDENTIFIER = com.xypher.neonfit;
+                          PRODUCT_NAME = "$(TARGET_NAME)";
+                          SWIFT_VERSION = 5.0;
+                          TARGETED_DEVICE_FAMILY = 1;
+                      };
+                      name = Release;
+                  };
+          /* End XCBuildConfiguration section */
+
+          /* Begin XCConfigurationList section */
+                  EEEEEEEEEEEEEEEE00000001 /* Build configuration list for PBXProject "NeonFit" */ = {
+                      isa = XCConfigurationList;
+                      buildConfigurations = (
+                          DDDDDDDDDDDDDDDD00000001 /* Debug */,
+                          DDDDDDDDDDDDDDDD00000002 /* Release */,
+                      );
+                      defaultConfigurationIsVisible = 0;
+                      defaultConfigurationName = Release;
+                  };
+                  EEEEEEEEEEEEEEEE00000002 /* Build configuration list for PBXNativeTarget "NeonFit" */ = {
+                      isa = XCConfigurationList;
+                      buildConfigurations = (
+                          DDDDDDDDDDDDDDDD00000003 /* Debug */,
+                          DDDDDDDDDDDDDDDD00000004 /* Release */,
+                      );
+                      defaultConfigurationIsVisible = 0;
+                      defaultConfigurationName = Release;
+                  };
+          /* End XCConfigurationList section */
+              };
+              rootObject = CCCCCCCCCCCCCCCC00000001 /* Project object */;
+          }
+          EOF_NEONFIT
+          find NeonFit -type f | sort
+
+      - name: Compilar la app iOS (sin firmar)
+        run: |
+          xcodebuild -project NeonFit/NeonFit.xcodeproj -target NeonFit -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" -derivedDataPath build/DD build
+          find build/DD/Build/Products -maxdepth 2 -name "*.app" | sort
+
+      - name: Empaquetar el IPA
+        run: |
+          APP=$(find build/DD/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -1)
+          echo "App encontrada: $APP"
+          rm -rf Payload NEONFIT.ipa
+          mkdir Payload
+          cp -R "$APP" Payload/
+          zip -qry NEONFIT.ipa Payload
+          ls -lh NEONFIT.ipa
+          unzip -l NEONFIT.ipa | head -20
+
+      - name: Publicar el IPA como Release descargable
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-v1.1
+          name: NEONFIT · IPA iPhone v1.1 (sin firmar)
+          body: "NEONFIT para iPhone (IPA sin firmar, con el diseno v1.1). Para instalarlo: firmalo con tu Apple ID usando 3uTools o Sideloadly en tu PC y luego instalalo en el iPhone. La firma gratuita de Apple ID dura 7 dias y se renueva volviendo a firmar."
+          files: NEONFIT.ipa
+
+      - name: Guardar también como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEONFIT-ipa
+          path: NEONFIT.ipa
