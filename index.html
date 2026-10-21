@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEONFIT · Entrenamiento en casa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#2fe81c; --green-neon:#39ff14; --green-deep:#0d9e4f;
+    --orange:#ff7300; --orange-neon:#ff8a1e;
+    --ink:#141708; --mut:#6d7263;
+    --glass:linear-gradient(150deg, rgba(255,255,255,.78), rgba(255,255,255,.40));
+    --glass-brd:rgba(255,255,255,.85);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+    color:var(--ink); background:#f6f8f1; min-height:100vh; overflow-x:hidden;
+  }
+  /* ===== fondo: blanco con halos fosforescentes y rejilla ===== */
+  .bg{position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(560px 380px at 110% -60px, rgba(255,115,0,.20), transparent 62%),
+      radial-gradient(620px 460px at -140px 22%, rgba(57,255,20,.16), transparent 62%),
+      radial-gradient(520px 420px at 108% 62%, rgba(57,255,20,.13), transparent 60%),
+      radial-gradient(560px 420px at -120px 96%, rgba(255,115,0,.15), transparent 62%),
+      linear-gradient(170deg,#fbfcf7,#f2f5ec);
+  }
+  .bg::after{content:""; position:absolute; inset:0;
+    background-image:radial-gradient(rgba(20,23,8,.07) 1.2px, transparent 1.6px);
+    background-size:22px 22px;}
+  .app{max-width:430px; margin:0 auto; padding:0 18px 130px;}
+
+  /* ===== cristal liquido ===== */
+  .glass{
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(18px) saturate(170%);
+    backdrop-filter:blur(18px) saturate(170%);
+    border:1px solid var(--glass-brd);
+    box-shadow: inset 0 1.5px 1px rgba(255,255,255,.95), inset 0 -10px 22px rgba(120,140,90,.10),
+                0 14px 30px rgba(31,46,10,.10);
+    position:relative;
+  }
+  .glass::before{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 42%);}
+  .cut{clip-path:polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));}
+  .cutwrap{filter:drop-shadow(0 16px 22px rgba(31,46,10,.16));}
+
+  /* ===== cabecera ===== */
+  header{display:flex; align-items:center; justify-content:space-between; padding:20px 2px 8px;}
+  .logo{display:flex; align-items:center; gap:10px; font-weight:900; font-size:21px; letter-spacing:.5px;}
+  .logo .dot{width:34px;height:34px;border-radius:12px; display:grid; place-items:center; color:#0c1403;
+    background:linear-gradient(140deg,var(--green-neon),#a6ff4d);
+    box-shadow:0 0 0 1px rgba(255,255,255,.7) inset, 0 8px 18px rgba(57,255,20,.45), 0 0 22px rgba(57,255,20,.35);}
+  .logo em{font-style:normal; color:var(--orange);}
+  .avatar{width:44px;height:44px;border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:15px;
+    background:var(--glass); border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    box-shadow: inset 0 1.5px 1px #fff, 0 10px 20px rgba(31,46,10,.12); color:var(--green-deep);}
+
+  h1.title{font-size:31px; font-weight:800; line-height:1.12; margin:14px 2px 4px;}
+  h1.title .g{color:var(--green-deep); text-shadow:0 0 18px rgba(57,255,20,.45);}
+  h1.title .o{color:var(--orange);}
+  .subtitle{color:var(--mut); font-size:14px; margin:0 2px 18px;}
+
+  /* ===== hero cyberpunk ===== */
+  .hero{border-radius:38px; padding:24px 22px 22px; color:#0d1402; overflow:visible;
+    background:linear-gradient(135deg,#5cff2e 0%, #2fe81c 42%, #11c95e 78%, #0bb56b 100%);
+    box-shadow: inset 0 2px 2px rgba(255,255,255,.75), inset 0 -26px 40px rgba(0,90,40,.28),
+                0 24px 42px rgba(23,190,60,.38), 0 0 44px rgba(57,255,20,.30);}
+  .hero::before{content:""; position:absolute; inset:0; border-radius:inherit;
+    background:linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0) 46%);}
+  .hero .tab{position:absolute; top:-16px; right:26px; z-index:3; display:flex; align-items:center; gap:7px;
+    background:#101207; color:#c9ff9e; font-size:11px; font-weight:700; letter-spacing:2.5px;
+    padding:9px 14px; border-radius:999px; box-shadow:0 12px 22px rgba(10,20,0,.35), 0 0 18px rgba(57,255,20,.35);}
+  .hero .kicker{font-size:11.5px; font-weight:800; letter-spacing:3px; opacity:.75;}
+  .hero h2{font-size:27px; font-weight:900; line-height:1.15; margin:6px 0 12px; max-width:250px;}
+  .hero .meta{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;}
+  .hero .meta span{background:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.75);
+    padding:6px 11px; border-radius:999px; font-size:12px; font-weight:700;
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);}
+  .hero .go{display:inline-flex; align-items:center; gap:10px; background:#101207; color:#fff;
+    border:none; cursor:pointer; font-family:inherit; font-weight:800; font-size:15px;
+    padding:14px 22px; border-radius:999px; letter-spacing:.4px;
+    box-shadow:0 16px 26px rgba(6,30,0,.4), inset 0 1.5px 1px rgba(255,255,255,.35);}
+  .hero .go .play{width:26px;height:26px;border-radius:50%; display:grid; place-items:center;
+    background:var(--orange); box-shadow:0 0 16px rgba(255,115,0,.8);}
+
+  /* ===== stats ===== */
+  .stats{display:flex; gap:10px; margin:16px 0 6px;}
+  .stat{flex:1; border-radius:22px; padding:13px 8px 11px; text-align:center;}
+  .stat b{display:block; font-size:19px; font-weight:900;}
+  .stat b.g{color:var(--green-deep); text-shadow:0 0 14px rgba(57,255,20,.5);}
+  .stat b.o{color:var(--orange);}
+  .stat small{font-size:11px; color:var(--mut); font-weight:600; letter-spacing:.6px;}
+
+  /* ===== secciones ===== */
+  .sec-head{display:flex; align-items:baseline; justify-content:space-between; margin:24px 2px 12px;}
+  .sec-head h3{font-size:19px; font-weight:800;}
+  .sec-head button{background:none;border:none;font-family:inherit; font-size:13px; font-weight:700; color:var(--orange); cursor:pointer;}
+
+  /* ===== categorias ===== */
+  .cats{display:flex; gap:9px; overflow-x:auto; padding:4px 2px 8px; scrollbar-width:none;}
+  .cats::-webkit-scrollbar{display:none}
+  .cat{flex:0 0 auto; cursor:pointer; font-family:inherit; font-size:13.5px; font-weight:700;
+    padding:11px 17px; border-radius:999px; color:var(--ink);
+    background:var(--glass); border:1.5px solid rgba(255,255,255,.9);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+    box-shadow: inset 0 1.5px 1px #fff, 0 8px 16px rgba(31,46,10,.08);}
+  .cat.on{border-color:var(--green); color:#0a3005;
+    box-shadow: inset 0 1.5px 1px #fff, 0 0 0 1.5px var(--green), 0 10px 22px rgba(57,255,20,.35), 0 0 20px rgba(57,255,20,.3);}
+  .cat.on.alt{border-color:var(--orange); box-shadow: inset 0 1.5px 1px #fff, 0 0 0 1.5px var(--orange), 0 10px 22px rgba(255,115,0,.3), 0 0 20px rgba(255,115,0,.28);}
+
+  /* ===== tarjetas de rutina ===== */
+  .routine{border-radius:0; padding:18px; display:flex; gap:14px; align-items:center; cursor:pointer; margin-bottom:14px;}
+  .routine .badge{flex:0 0 auto; width:56px; height:56px; border-radius:19px; display:grid; place-items:center; color:#fff;}
+  .routine .badge.g{background:linear-gradient(145deg,#43f21f,#0d9e4f); box-shadow:0 10px 20px rgba(35,220,60,.42), 0 0 18px rgba(57,255,20,.35), inset 0 1.5px 1px rgba(255,255,255,.6);}
+  .routine .badge.o{background:linear-gradient(145deg,#ffa31e,#ff5f00); box-shadow:0 10px 20px rgba(255,120,0,.42), 0 0 18px rgba(255,115,0,.35), inset 0 1.5px 1px rgba(255,255,255,.6);}
+  .routine h4{font-size:16.5px; font-weight:800; line-height:1.2;}
+  .routine p{font-size:12.5px; color:var(--mut); font-weight:600; margin-top:3px;}
+  .routine .chips{display:flex; gap:6px; margin-top:8px;}
+  .routine .chips span{font-size:11px; font-weight:800; letter-spacing:.4px; padding:4.5px 9px; border-radius:999px;
+    background:rgba(20,23,8,.06); border:1px solid rgba(20,23,8,.08);}
+  .routine .chips span.nv{color:var(--green-deep); background:rgba(57,255,20,.14); border-color:rgba(57,255,20,.4);}
+  .routine .chips span.no{color:#c25100; background:rgba(255,115,0,.12); border-color:rgba(255,115,0,.35);}
+  .routine .arrow{margin-left:auto; flex:0 0 auto; width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
+    background:#101207; color:#fff; box-shadow:0 10px 18px rgba(10,15,0,.3);}
+
+  /* ===== filas de ejercicio ===== */
+  .exrow{display:flex; align-items:center; gap:13px; border-radius:24px; padding:13px 15px; margin-bottom:10px;}
+  .exrow .num{flex:0 0 auto; width:42px; height:42px; border-radius:15px; display:grid; place-items:center;
+    font-weight:900; font-size:15px; color:#0c2403; background:linear-gradient(145deg, rgba(57,255,20,.85), rgba(57,255,20,.45));
+    border:1px solid rgba(255,255,255,.8); box-shadow:0 0 14px rgba(57,255,20,.35), inset 0 1.5px 1px #fff;}
+  .exrow:nth-child(even) .num{background:linear-gradient(145deg, rgba(255,150,30,.9), rgba(255,115,0,.5)); color:#331a00;
+    box-shadow:0 0 14px rgba(255,115,0,.32), inset 0 1.5px 1px #fff;}
+  .exrow h5{font-size:15px; font-weight:700;}
+  .exrow p{font-size:12px; color:var(--mut); font-weight:600;}
+  .exrow .muscle{margin-left:auto; font-size:10.5px; font-weight:800; letter-spacing:1px; color:var(--green-deep);
+    border:1.5px solid rgba(35,200,80,.45); padding:5px 9px; border-radius:999px; white-space:nowrap;}
+
+  /* ===== vistas ===== */
+  .view{display:none;}
+  .view.active{display:block; animation:vin .45s cubic-bezier(.22,.9,.3,1);}
+  @keyframes vin{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
+
+  /* ===== menu inferior flotante con burbuja liquida ===== */
+  nav{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom));
+    width:min(412px, calc(100vw - 28px)); height:82px; border-radius:42px; z-index:50;
+    display:flex; padding:8px;
+    background:linear-gradient(160deg, rgba(255,255,255,.82), rgba(255,255,255,.5));
+    -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow: inset 0 2px 2px rgba(255,255,255,1), inset 0 -12px 24px rgba(120,140,90,.12),
+                0 22px 40px rgba(31,46,10,.20), 0 0 34px rgba(57,255,20,.12);}
+  nav .bubble{position:absolute; top:50%; left:0; width:66px; height:66px; border-radius:50%; z-index:0;
+    transform:translate(0,-50%);
+    background:linear-gradient(150deg, #6bff45, var(--green) 55%, #0db968);
+    box-shadow: inset 0 2.5px 3px rgba(255,255,255,.85), inset 0 -12px 20px rgba(0,100,40,.35),
+                0 14px 26px rgba(35,220,60,.5), 0 0 26px rgba(57,255,20,.55);
+    transition:transform .6s cubic-bezier(.65,-0.25,.25,1.3);}
+  nav .bubble.stretch{animation:squish .6s cubic-bezier(.65,-0.25,.25,1.3);}
+  @keyframes squish{0%{scale:1 1} 35%{scale:1.28 .82} 70%{scale:.92 1.1} 100%{scale:1 1}}
+  nav button{flex:1; position:relative; z-index:1; background:none; border:none; cursor:pointer; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    color:#7a7f6e; font-size:10px; font-weight:700; letter-spacing:.4px; transition:color .3s;}
+  nav button svg{width:24px; height:24px;}
+  nav button.on{color:#fff; text-shadow:0 1px 6px rgba(0,80,30,.4);}
+
+  /* ===== detalle y reproductor ===== */
+  .backbtn{display:inline-flex; align-items:center; gap:8px; margin:16px 0 6px; cursor:pointer;
+    font-family:inherit; font-weight:800; font-size:14px; color:var(--ink);
+    padding:11px 17px; border-radius:999px; border:1px solid var(--glass-brd);}
+  .detail-hero{border-radius:34px; padding:22px; margin-top:10px;}
+  .detail-hero h2{font-size:25px; font-weight:900; line-height:1.15;}
+  .detail-hero p{color:var(--mut); font-weight:600; font-size:13.5px; margin-top:6px;}
+  .startbtn{width:100%; margin:18px 0 22px; border:none; cursor:pointer; font-family:inherit;
+    font-weight:900; font-size:17px; letter-spacing:.5px; color:#fff; padding:18px; border-radius:999px;
+    background:linear-gradient(140deg,#ffa31e,#ff5f00);
+    box-shadow:0 18px 30px rgba(255,115,0,.4), 0 0 26px rgba(255,115,0,.3), inset 0 2px 2px rgba(255,255,255,.6);}
+  .player{position:fixed; inset:0; z-index:80; display:none; flex-direction:column; align-items:center;
+    padding:34px 22px calc(26px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(250,252,246,.9), rgba(240,246,233,.86));
+    -webkit-backdrop-filter:blur(24px) saturate(160%); backdrop-filter:blur(24px) saturate(160%);}
+  .player.open{display:flex;}
+  .player .phase{font-size:12.5px; font-weight:900; letter-spacing:4px; color:var(--green-deep);}
+  .player .phase.rest{color:var(--orange);}
+  .player h2{font-size:29px; font-weight:900; text-align:center; margin:10px 0 2px; line-height:1.15;}
+  .player .count{font-size:13.5px; color:var(--mut); font-weight:700;}
+  .ringwrap{position:relative; width:262px; height:262px; margin:30px 0 8px;}
+  .ringwrap svg{transform:rotate(-90deg);}
+  .ringbg{fill:none; stroke:rgba(20,23,8,.08); stroke-width:15;}
+  .ringfg{fill:none; stroke:url(#ringgrad); stroke-width:15; stroke-linecap:round;
+    filter:drop-shadow(0 0 10px rgba(57,255,20,.55)); transition:stroke-dashoffset .3s linear;}
+  .ringwrap.rest .ringfg{filter:drop-shadow(0 0 10px rgba(255,115,0,.6));}
+  .ringtime{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .ringtime b{font-size:58px; font-weight:900; line-height:1;}
+  .ringtime small{font-size:12px; font-weight:800; letter-spacing:2.5px; color:var(--mut); margin-top:5px;}
+  .pcontrols{display:flex; align-items:center; gap:16px; margin-top:26px;}
+  .pcontrols button{border:none; cursor:pointer; font-family:inherit; display:grid; place-items:center; border-radius:50%;}
+  .pcontrols .side{width:56px; height:56px; color:var(--ink); background:var(--glass); border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); box-shadow: inset 0 1.5px 1px #fff, 0 10px 20px rgba(31,46,10,.12);}
+  .pcontrols .main{width:78px; height:78px; color:#fff; background:linear-gradient(145deg,#43f21f,#0d9e4f);
+    box-shadow:0 18px 30px rgba(35,220,60,.45), 0 0 26px rgba(57,255,20,.4), inset 0 2px 2px rgba(255,255,255,.6);}
+  .pnext{margin-top:22px; font-size:13.5px; font-weight:700; color:var(--mut); text-align:center;}
+  .pnext b{color:var(--ink);}
+  .quitbtn{margin-top:auto; background:none; border:none; font-family:inherit; font-weight:800; font-size:14px; color:#c25100; cursor:pointer; padding:10px;}
+  .done-emoji{font-size:74px; margin-top:36px;}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="app">
+  <header>
+    <div class="logo">
+      <span class="dot">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" fill="#0c1403"/></svg>
+      </span>
+      NEON<em>FIT</em>
+    </div>
+    <div class="avatar">AT</div>
+  </header>
+
+  <!-- ============ INICIO ============ -->
+  <section class="view active" id="view-home">
+    <h1 class="title">Entrena en <span class="g">casa</span>,<br>brilla como <span class="o">neón</span></h1>
+    <p class="subtitle">Sin equipo. Sin excusas. A tu ritmo.</p>
+
+    <div class="hero glass" style="background:linear-gradient(135deg,#5cff2e,#2fe81c 42%,#11c95e 78%,#0bb56b)">
+      <div class="tab">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#c9ff9e" stroke-width="2.5" stroke-dasharray="4 5" stroke-linecap="round"/></svg>
+        HOY · 2077 MODE
+      </div>
+      <div class="kicker">RUTINA DE HOY</div>
+      <h2>Cuerpo Completo Express</h2>
+      <div class="meta"><span>⏱ 18 min</span><span>6 ejercicios</span><span>Sin equipo</span></div>
+      <button class="go" onclick="openRoutine(0)">
+        <span class="play"><svg width="12" height="12" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5-13-7.5Z" fill="#fff"/></svg></span>
+        Empezar ahora
+      </button>
+    </div>
+
+    <div class="stats">
+      <div class="stat glass" style="border-radius:22px"><b class="g">5</b><small>RUTINAS</small></div>
+      <div class="stat glass" style="border-radius:22px"><b>12</b><small>EJERCICIOS</small></div>
+      <div class="stat glass" style="border-radius:22px"><b class="o">0</b><small>EQUIPO</small></div>
+    </div>
+
+    <div class="sec-head"><h3>Categorías</h3></div>
+    <div class="cats" id="home-cats"></div>
+
+    <div class="sec-head"><h3>Rutinas destacadas</h3><button onclick="go(1)">Ver todas</button></div>
+    <div id="home-routines"></div>
+
+    <div class="sec-head"><h3>Calentamiento rápido</h3><button onclick="go(2)">Ver ejercicios</button></div>
+    <div id="home-exercises"></div>
+  </section>
+
+  <!-- ============ RUTINAS ============ -->
+  <section class="view" id="view-routines">
+    <h1 class="title">Rutinas <span class="g">listas</span><br>para <span class="o">ti</span></h1>
+    <p class="subtitle">Toca una rutina y empieza el modo guiado.</p>
+    <div id="all-routines"></div>
+  </section>
+
+  <!-- ============ EJERCICIOS ============ -->
+  <section class="view" id="view-exercises">
+    <h1 class="title">Todos los<br><span class="g">ejercicios</span></h1>
+    <p class="subtitle">Filtra por zona del cuerpo.</p>
+    <div class="cats" id="ex-cats"></div>
+    <div id="ex-list" style="margin-top:8px"></div>
+  </section>
+
+  <!-- ============ PERFIL ============ -->
+  <section class="view" id="view-profile">
+    <h1 class="title">Tu <span class="o">zona</span></h1>
+    <p class="subtitle">Sin cuentas ni nube: todo vive en tu teléfono.</p>
+    <div class="cutwrap"><div class="routine glass cut" style="cursor:default">
+      <div class="badge g"><svg width="27" height="27" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#fff"/><path d="M4 21c1.2-3.8 4.2-5.5 8-5.5s6.8 1.7 8 5.5" fill="#fff"/></svg></div>
+      <div><h4>Atleta en casa</h4><p>Modo guiado · 1 vuelta por rutina</p>
+      <div class="chips"><span class="nv">SIN EQUIPO</span><span class="no">OFFLINE</span></div></div>
+    </div></div>
+    <div class="sec-head"><h3>Tips rápidos</h3></div>
+    <div class="exrow glass"><div class="num">1</div><div><h5>Calienta 2 minutos</h5><p>Jumping jacks suaves antes de empezar.</p></div></div>
+    <div class="exrow glass"><div class="num">2</div><div><h5>Respira con el ritmo</h5><p>Exhala en el esfuerzo, inhala al volver.</p></div></div>
+    <div class="exrow glass"><div class="num">3</div><div><h5>Constancia &gt; intensidad</h5><p>15 minutos diarios valen más que un día a tope.</p></div></div>
+  </section>
+
+  <!-- ============ DETALLE DE RUTINA ============ -->
+  <section class="view" id="view-detail">
+    <button class="backbtn glass" onclick="go(state.backTo)">← Volver</button>
+    <div class="detail-hero glass" id="detail-hero"></div>
+    <button class="startbtn" onclick="startPlayer()">▶ &nbsp;INICIAR MODO GUIADO</button>
+    <div id="detail-list"></div>
+  </section>
+</div>
+
+<!-- ============ MENU INFERIOR ============ -->
+<nav id="nav">
+  <div class="bubble" id="bubble"></div>
+  <button class="on" data-view="0" onclick="go(0)">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M3.5 11 12 3.5 20.5 11v9a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6h-5v6H5A1.5 1.5 0 0 1 3.5 20v-9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    Inicio
+  </button>
+  <button data-view="1" onclick="go(1)">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    Rutinas
+  </button>
+  <button data-view="2" onclick="go(2)">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    Ejercicios
+  </button>
+  <button data-view="3" onclick="go(3)">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.6" stroke="currentColor" stroke-width="2"/><path d="M5 20.5c1.4-3.9 4-5.4 7-5.4s5.6 1.5 7 5.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    Perfil
+  </button>
+</nav>
+
+<!-- ============ REPRODUCTOR ============ -->
+<div class="player" id="player">
+  <div class="phase" id="p-phase">EJERCICIO</div>
+  <h2 id="p-name">—</h2>
+  <div class="count" id="p-count">1 / 6</div>
+  <div class="ringwrap" id="ringwrap">
+    <svg width="262" height="262" viewBox="0 0 262 262">
+      <defs>
+        <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#39ff14"/><stop offset=".5" stop-color="#5cff2e"/><stop offset=".78" stop-color="#b6e81c"/><stop offset="1" stop-color="#ff7300"/>
+        </linearGradient>
+      </defs>
+      <circle class="ringbg" cx="131" cy="131" r="112"/>
+      <circle class="ringfg" id="ringfg" cx="131" cy="131" r="112"/>
+    </svg>
+    <div class="ringtime"><b id="p-time">40</b><small id="p-reps">3 × 15</small></div>
+  </div>
+  <div class="pcontrols">
+    <button class="side" onclick="prevEx()" aria-label="Anterior"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M6 5v14M19 5.5 9.5 12 19 18.5v-13Z" fill="currentColor"/></svg></button>
+    <button class="main" id="p-toggle" onclick="togglePlayer()" aria-label="Pausar o seguir"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 4.5h3.6v15H7zM13.4 4.5H17v15h-3.6z" fill="#fff"/></svg></button>
+    <button class="side" onclick="nextEx()" aria-label="Siguiente"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M18 5v14M5 5.5 14.5 12 5 18.5v-13Z" fill="currentColor"/></svg></button>
+  </div>
+  <div class="pnext" id="p-next"></div>
+  <button class="quitbtn" onclick="closePlayer()">Terminar rutina ✕</button>
+</div>
+<script>
+/* ================= DATOS (sin base de datos: todo local) ================= */
+const EXERCISES = [
+  {name:"Sentadillas",        muscle:"PIERNAS",  sets:"3 × 15",      secs:40},
+  {name:"Flexiones",          muscle:"BRAZOS",   sets:"3 × 12",      secs:40},
+  {name:"Zancadas",           muscle:"PIERNAS",  sets:"3 × 10",      secs:45},
+  {name:"Plancha",            muscle:"ABDOMEN",  sets:"3 × 40 seg",  secs:40},
+  {name:"Puente de glúteo",   muscle:"GLÚTEOS",  sets:"3 × 15",      secs:40},
+  {name:"Fondos en silla",    muscle:"BRAZOS",   sets:"3 × 12",      secs:40},
+  {name:"Mountain climbers",  muscle:"CARDIO",   sets:"3 × 30 seg",  secs:30},
+  {name:"Crunch abdominal",   muscle:"ABDOMEN",  sets:"3 × 20",      secs:35},
+  {name:"Jumping jacks",      muscle:"CARDIO",   sets:"3 × 45 seg",  secs:45},
+  {name:"Sentadilla búlgara", muscle:"PIERNAS",  sets:"3 × 10",      secs:45},
+  {name:"Superman",           muscle:"ESPALDA",  sets:"3 × 15",      secs:35},
+  {name:"Burpees",            muscle:"FULL",     sets:"3 × 10",      secs:40},
+];
+const ROUTINES = [
+  {name:"Cuerpo Completo Express", mins:18, level:"MEDIO",   ex:[0,1,3,4,6,8]},
+  {name:"Piernas de Acero",        mins:15, level:"MEDIO",   ex:[0,2,9,4]},
+  {name:"Abdomen Neón",            mins:10, level:"FÁCIL",   ex:[3,7,10,6]},
+  {name:"Brazos sin Equipo",       mins:12, level:"FÁCIL",   ex:[1,5,10,3]},
+  {name:"Cardio en Casa",          mins:20, level:"INTENSO", ex:[8,6,11,0,2]},
+];
+const CATS = ["TODO","PIERNAS","ABDOMEN","BRAZOS","CARDIO","GLÚTEOS","ESPALDA","FULL"];
+const boltSVG = '<svg width="27" height="27" viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" fill="#fff"/></svg>';
+const flameSVG = '<svg width="27" height="27" viewBox="0 0 24 24" fill="none"><path d="M12 2.5s5.5 4.6 5.5 10a5.5 5.5 0 0 1-11 0c0-2 1-3.7 2.2-5.2.4 1 1.1 1.8 2.1 2.3C10.6 6.9 11 4.5 12 2.5Z" fill="#fff"/></svg>';
+const arrowSVG = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12h15m-6-7 7 7-7 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const state = { view:0, routine:0, backTo:0, cat:"TODO" };
+
+function routineCard(r, i){
+  const alt = i % 2 === 1;
+  return `<div class="cutwrap"><div class="routine glass cut" onclick="openRoutine(${i})">
+    <div class="badge ${alt ? 'o':'g'}">${alt ? flameSVG : boltSVG}</div>
+    <div><h4>${r.name}</h4><p>${r.ex.length} ejercicios · Sin equipo</p>
+    <div class="chips"><span>⏱ ${r.mins} MIN</span><span class="${r.level==='INTENSO' ? 'no':'nv'}">${r.level}</span></div></div>
+    <div class="arrow">${arrowSVG}</div></div></div>`;
+}
+function exRow(e, idx){
+  return `<div class="exrow glass"><div class="num">${String(idx+1).padStart(2,'0')}</div>
+    <div><h5>${e.name}</h5><p>${e.sets}</p></div><span class="muscle">${e.muscle}</span></div>`;
+}
+function catPills(elId, onclickFn){
+  document.getElementById(elId).innerHTML = CATS.map((c,i)=>
+    `<button class="cat ${state.cat===c?'on':''} ${i%2? 'alt':''}" data-cat="${c}" onclick="${onclickFn}('${c}')">${c==='TODO'?'Todo':c.charAt(0)+c.slice(1).toLowerCase()}</button>`).join('');
+}
+function renderHome(){
+  document.getElementById('home-routines').innerHTML = ROUTINES.slice(0,3).map(routineCard).join('');
+  document.getElementById('home-exercises').innerHTML = [EXERCISES[8], EXERCISES[6], EXERCISES[3]].map((e,i)=>exRow(e, EXERCISES.indexOf(e))).join('');
+  catPills('home-cats','homeCat');
+}
+function renderRoutines(){
+  document.getElementById('all-routines').innerHTML = ROUTINES.map(routineCard).join('');
+}
+function renderExercises(){
+  catPills('ex-cats','exCat');
+  const list = EXERCISES.map((e,i)=>({e,i})).filter(x => state.cat==='TODO' || x.e.muscle===state.cat);
+  document.getElementById('ex-list').innerHTML = list.length
+    ? list.map(x=>exRow(x.e, x.i)).join('')
+    : '<p style="color:var(--mut);font-weight:600;padding:8px 2px">Sin ejercicios en esta zona todavía.</p>';
+}
+function homeCat(c){ state.cat = c; go(2); }
+function exCat(c){ state.cat = c; renderExercises(); }
+
+/* ================= NAVEGACION + BURBUJA LIQUIDA ================= */
+const VIEWS = ['view-home','view-routines','view-exercises','view-profile'];
+function moveBubble(i, animate=true){
+  const nav = document.getElementById('nav');
+  const bubble = document.getElementById('bubble');
+  const btns = nav.querySelectorAll('button');
+  const b = btns[i];
+  const x = b.offsetLeft + b.offsetWidth/2 - 33;
+  bubble.style.transition = animate ? '' : 'none';
+  bubble.style.transform = `translate(${x}px,-50%)`;
+  if (animate){
+    bubble.classList.remove('stretch'); void bubble.offsetWidth; bubble.classList.add('stretch');
+  }
+  btns.forEach((el,j)=>el.classList.toggle('on', j===i));
+}
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0});
+}
+function go(i){
+  state.view = i;
+  if (i===1) renderRoutines();
+  if (i===2) renderExercises();
+  show(VIEWS[i]);
+  moveBubble(i);
+}
+function openRoutine(i){
+  state.routine = i; state.backTo = state.view === 4 ? state.backTo : state.view;
+  const r = ROUTINES[i];
+  document.getElementById('detail-hero').innerHTML =
+    `<div class="kicker" style="font-size:11.5px;font-weight:800;letter-spacing:3px;color:var(--green-deep)">RUTINA · ${r.level}</div>
+     <h2>${r.name}</h2>
+     <p>⏱ ${r.mins} minutos · ${r.ex.length} ejercicios · Sin equipo · Modo guiado de 1 vuelta</p>`;
+  document.getElementById('detail-list').innerHTML = r.ex.map((ei,k)=>exRow(EXERCISES[ei], k)).join('');
+  show('view-detail');
+  if (state.view !== 4){ /* el detalle vive fuera de las 4 vistas del menu */ }
+  state.view = 4;
+}
+window.addEventListener('resize', ()=>{ if (state.view < 4) moveBubble(state.view, false); });
+
+/* ================= REPRODUCTOR ================= */
+const P = { list:[], idx:0, phase:'work', t:0, total:0, timer:null, playing:false };
+const CIRC = 2 * Math.PI * 112;
+function beep(f=880, d=0.12){
+  try{
+    const ctx = beep.ctx || (beep.ctx = new (window.AudioContext||window.webkitAudioContext)());
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(.12, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + d);
+    o.start(); o.stop(ctx.currentTime + d);
+  }catch(e){}
+}
+function startPlayer(){
+  const r = ROUTINES[state.routine];
+  P.list = r.ex.slice(); P.idx = 0;
+  document.getElementById('player').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadPhase('work');
+  playTimer();
+}
+function loadPhase(phase){
+  P.phase = phase;
+  const e = EXERCISES[P.list[P.idx]];
+  P.total = phase === 'work' ? e.secs : 10;
+  P.t = P.total;
+  const ph = document.getElementById('p-phase');
+  ph.textContent = phase === 'work' ? 'EJERCICIO' : 'DESCANSA';
+  ph.classList.toggle('rest', phase === 'rest');
+  document.getElementById('ringwrap').classList.toggle('rest', phase === 'rest');
+  document.getElementById('p-name').textContent = phase === 'work' ? e.name : 'Respira…';
+  document.getElementById('p-reps').textContent = phase === 'work' ? e.sets : 'siguiente pronto';
+  document.getElementById('p-count').textContent = (P.idx+1) + ' / ' + P.list.length;
+  const nx = P.list[P.idx+1];
+  document.getElementById('p-next').innerHTML = phase === 'work'
+    ? (nx ? 'Sigue: <b>' + EXERCISES[nx].name + '</b>' : 'Último ejercicio 💪')
+    : 'Sigue: <b>' + e.name + '</b>';
+  drawRing();
+}
+function drawRing(){
+  document.getElementById('p-time').textContent = P.t;
+  document.getElementById('ringfg').style.strokeDasharray = CIRC;
+  document.getElementById('ringfg').style.strokeDashoffset = CIRC * (1 - (P.total ? P.t / P.total : 0));
+}
+function tick(){
+  P.t--;
+  if (P.t <= 3 && P.t > 0) beep(660, .08);
+  if (P.t <= 0){
+    beep(990, .18);
+    if (P.phase === 'work'){
+      if (P.idx >= P.list.length - 1){ finishPlayer(); return; }
+      loadPhase('rest');
+    } else {
+      P.idx++; loadPhase('work');
+    }
+    return;
+  }
+  drawRing();
+}
+function playTimer(){
+  clearInterval(P.timer);
+  P.playing = true;
+  P.timer = setInterval(tick, 1000);
+  document.getElementById('p-toggle').innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24"><path d="M7 4.5h3.6v15H7zM13.4 4.5H17v15h-3.6z" fill="#fff"/></svg>';
+}
+function pauseTimer(){
+  P.playing = false;
+  clearInterval(P.timer);
+  document.getElementById('p-toggle').innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24"><path d="M7.5 4.8v14.4L19 12 7.5 4.8Z" fill="#fff"/></svg>';
+}
+function togglePlayer(){ P.playing ? pauseTimer() : playTimer(); }
+function nextEx(){
+  if (P.phase === 'work'){
+    if (P.idx >= P.list.length - 1){ finishPlayer(); return; }
+    loadPhase('rest');
+  } else { P.idx++; loadPhase('work'); }
+}
+function prevEx(){
+  if (P.phase === 'rest'){ loadPhase('work'); return; }
+  if (P.idx > 0) P.idx--;
+  loadPhase('work');
+}
+function finishPlayer(){
+  pauseTimer();
+  document.getElementById('p-phase').textContent = '¡LISTO!';
+  document.getElementById('p-phase').classList.remove('rest');
+  document.getElementById('p-name').textContent = 'Rutina completa 🎉';
+  document.getElementById('p-count').textContent = P.list.length + ' ejercicios hechos';
+  document.getElementById('p-time').textContent = '✓';
+  document.getElementById('p-reps').textContent = 'buen trabajo';
+  document.getElementById('p-next').innerHTML = 'Vuelve mañana por más 💪';
+  document.getElementById('ringfg').style.strokeDashoffset = 0;
+  beep(880,.15); setTimeout(()=>beep(1320,.22), 180);
+}
+function closePlayer(){
+  pauseTimer();
+  document.getElementById('player').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ================= ARRANQUE ================= */
+renderHome();
+requestAnimationFrame(()=>moveBubble(0, false));
+</script>
+</body>
+</html>
