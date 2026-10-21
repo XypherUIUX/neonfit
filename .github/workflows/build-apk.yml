@@ -74,6 +74,15 @@ jobs:
                   versionName '1.1'
               }
 
+              signingConfigs {
+                  debug {
+                      storeFile file('../debug.keystore')
+                      storePassword 'android'
+                      keyAlias 'androiddebugkey'
+                      keyPassword 'android'
+                  }
+              }
+
               buildTypes {
                   release {
                       minifyEnabled false
@@ -216,9 +225,8 @@ jobs:
         env:
           KS_B64: ${{ secrets.DEBUG_KEYSTORE_B64 }}
         run: |
-          mkdir -p ~/.android
-          echo "$KS_B64" | base64 -d > ~/.android/debug.keystore
-          ls -l ~/.android/debug.keystore
+          echo "$KS_B64" | base64 -d > android/debug.keystore
+          ls -l android/debug.keystore
 
       - name: Compilar APK (debug, instalable)
         working-directory: android
