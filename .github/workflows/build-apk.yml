@@ -70,8 +70,8 @@ jobs:
                   applicationId 'com.xypher.neonfit'
                   minSdk 26
                   targetSdk 34
-                  versionCode 1
-                  versionName '1.0'
+                  versionCode 2
+                  versionName '1.1'
               }
 
               buildTypes {
@@ -89,7 +89,6 @@ jobs:
           cat > android/app/src/main/AndroidManifest.xml <<'EOF_NEONFIT'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
               <application
                   android:allowBackup="true"
                   android:icon="@mipmap/ic_launcher"
@@ -97,7 +96,6 @@ jobs:
                   android:label="@string/app_name"
                   android:theme="@style/Theme.NeonFit"
                   android:usesCleartextTraffic="false">
-
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
@@ -222,9 +220,9 @@ jobs:
       - name: Publicar la APK como Release descargable
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0
-          name: NEONFIT · APK v1.0
-          body: "App de entrenamiento en casa NEONFIT. Descarga NEONFIT.apk e instálala en tu Android (permite 'orígenes desconocidos' si te lo pide)."
+          tag_name: v1.1
+          name: NEONFIT · APK v1.1
+          body: "NEONFIT v1.1: menu inferior en liquid glass y botones de ejercicios estilo material. Descarga NEONFIT.apk e instalala en tu Android."
           files: NEONFIT.apk
 
       - name: Guardar también como artefacto
