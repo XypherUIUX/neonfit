@@ -33,7 +33,7 @@ jobs:
 
       - name: Generar el proyecto Android y meter la web
         run: |
-          mkdir -p android/app/src/main/java/com/xypher/neonfit android/app/src/main/res/values android/app/src/main/res/drawable android/app/src/main/res/mipmap-anydpi-v26 android/app/src/main/assets
+          mkdir -p android/app/src/main/java/com/xypher/neonfit android/app/src/main/res/values android/app/src/main/res/drawable android/app/src/main/res/mipmap-anydpi-v26 android/app/src/main/res/drawable-nodpi android/app/src/main/res/mipmap-xxxhdpi android/app/src/main/assets
           cat > android/settings.gradle <<'EOF_NEONFIT'
           pluginManagement {
               repositories {
@@ -70,8 +70,8 @@ jobs:
                   applicationId 'com.xypher.neonfit'
                   minSdk 26
                   targetSdk 34
-                  versionCode 3
-                  versionName '2.0'
+                  versionCode 4
+                  versionName '2.1'
               }
 
               signingConfigs {
@@ -126,7 +126,9 @@ jobs:
           cat > android/app/src/main/java/com/xypher/neonfit/MainActivity.java <<'EOF_NEONFIT'
           package com.xypher.neonfit;
 
+          import android.Manifest;
           import android.app.Activity;
+          import android.content.pm.PackageManager;
           import android.graphics.Color;
           import android.os.Bundle;
           import android.view.View;
@@ -144,6 +146,9 @@ jobs:
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
+                  if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                      requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001);
+                  }
 
                   Window window = getWindow();
                   window.setStatusBarColor(Color.rgb(246, 248, 241));
@@ -190,7 +195,7 @@ jobs:
           cat > android/app/src/main/res/values/colors.xml <<'EOF_NEONFIT'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-              <color name="ic_launcher_background">#2FE81C</color>
+              <color name="ic_launcher_background">#EDF2ED</color>
           </resources>
           EOF_NEONFIT
           cat > android/app/src/main/res/values/themes.xml <<'EOF_NEONFIT'
@@ -204,33 +209,24 @@ jobs:
               </style>
           </resources>
           EOF_NEONFIT
-          cat > android/app/src/main/res/drawable/ic_launcher_foreground.xml <<'EOF_NEONFIT'
-          <?xml version="1.0" encoding="utf-8"?>
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="108dp"
-              android:height="108dp"
-              android:viewportWidth="108"
-              android:viewportHeight="108">
-              <path
-                  android:fillColor="#101207"
-                  android:pathData="M58,16 L30,62 L48,62 L42,92 L78,44 L59,44 Z" />
-          </vector>
-          EOF_NEONFIT
           cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF_NEONFIT'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
               <background android:drawable="@color/ic_launcher_background" />
-              <foreground android:drawable="@drawable/ic_launcher_foreground" />
+              <foreground android:drawable="@drawable/ic_launcher_art" />
           </adaptive-icon>
           EOF_NEONFIT
           cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml <<'EOF_NEONFIT'
           <?xml version="1.0" encoding="utf-8"?>
           <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
               <background android:drawable="@color/ic_launcher_background" />
-              <foreground android:drawable="@drawable/ic_launcher_foreground" />
+              <foreground android:drawable="@drawable/ic_launcher_art" />
           </adaptive-icon>
           EOF_NEONFIT
           cp index.html android/app/src/main/assets/index.html
+          cp appicon-1024.png android/app/src/main/res/drawable-nodpi/ic_launcher_art.png
+          cp appicon-1024.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cp appicon-1024.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
           find android -type f | sort
 
       - name: Restaurar la firma fija
@@ -250,9 +246,9 @@ jobs:
       - name: Publicar la APK como Release descargable
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0
-          name: NEONFIT · APK v2.0
-          body: "NEONFIT v2.0: Descarga NEONFIT.apk e instalala en tu Android."
+          tag_name: v2.1
+          name: NEONFIT · APK v2.1
+          body: "NEONFIT v2.1: Descarga NEONFIT.apk e instalala en tu Android."
           files: NEONFIT.apk
 
       - name: Guardar también como artefacto
