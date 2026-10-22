@@ -265,26 +265,26 @@
   nav::after{content:""; position:absolute; left:26px; right:26px; top:1px; height:1.5px; z-index:0; pointer-events:none;
     background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);}
   nav .bubble{position:absolute; top:50%; left:0; width:62px; height:62px; border-radius:50%; z-index:0;
-    transform:translate(0,-31px);
+    transform:translate(0,-31px); will-change:transform;
     background:
-      radial-gradient(115% 85% at 28% 6%, rgba(255,255,255,.92), rgba(255,255,255,0) 48%),
-      radial-gradient(95% 62% at 80% 98%, rgba(255,140,0,.34), rgba(255,140,0,0) 55%),
-      linear-gradient(155deg, rgba(198,255,160,.60), rgba(57,255,20,.34) 46%, rgba(10,178,102,.42));
-    -webkit-backdrop-filter:blur(5px) saturate(230%) brightness(1.1); backdrop-filter:blur(5px) saturate(230%) brightness(1.1);
-    border:1px solid rgba(255,255,255,.82);
-    box-shadow: inset 0 2px 3px rgba(255,255,255,.96), inset 0 0 0 1.5px rgba(255,255,255,.35),
-                inset 0 -11px 18px rgba(0,110,45,.30), inset 0 -3px 7px rgba(255,140,0,.30),
-                inset 7px 0 13px rgba(255,255,255,.35), inset -7px 0 13px rgba(140,255,200,.35),
-                0 14px 26px rgba(35,220,60,.42), 0 0 26px rgba(57,255,20,.48);}
-  nav .bubble::before{content:""; position:absolute; left:7px; right:7px; top:3px; height:17px; border-radius:50%;
-    background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,0)); filter:blur(1.5px); pointer-events:none;}
-  nav .bubble::after{content:""; position:absolute; top:7px; left:11px; width:22px; height:11px; border-radius:50%;
-    background:rgba(255,255,255,.9); filter:blur(3.5px); transform:rotate(-18deg); pointer-events:none;}
+      radial-gradient(120% 90% at 30% 0%, rgba(255,255,255,.55), rgba(255,255,255,0) 52%),
+      radial-gradient(95% 55% at 50% 112%, rgba(57,255,20,.15), rgba(255,140,0,.10) 58%, rgba(255,140,0,0) 78%),
+      linear-gradient(155deg, rgba(255,255,255,.14), rgba(255,255,255,.05) 52%, rgba(57,255,20,.10));
+    -webkit-backdrop-filter:blur(6px) saturate(240%) brightness(1.06); backdrop-filter:blur(6px) saturate(240%) brightness(1.06);
+    border:1px solid rgba(255,255,255,.68);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.28),
+                inset 0 -9px 15px rgba(255,255,255,.20), inset 0 -2px 5px rgba(23,68,32,.10),
+                inset 6px 0 11px rgba(255,255,255,.30), inset -6px 0 11px rgba(255,255,255,.22),
+                0 12px 22px rgba(38,120,40,.16), 0 5px 16px rgba(57,255,20,.20);}
+  nav .bubble::before{content:""; position:absolute; left:8px; right:8px; top:3px; height:16px; border-radius:50%;
+    background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,0)); filter:blur(1.2px); pointer-events:none;}
+  nav .bubble::after{content:""; position:absolute; top:8px; left:12px; width:19px; height:9px; border-radius:50%;
+    background:rgba(255,255,255,.75); filter:blur(3px); transform:rotate(-18deg); pointer-events:none;}
   nav button{flex:1; position:relative; z-index:1; background:none; border:none; cursor:pointer;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
     color:#7a7f6e; font-size:9.5px; font-weight:700; letter-spacing:.3px; transition:color .3s;}
   nav button svg{width:23px; height:23px;}
-  nav button.on{color:#fff; text-shadow:0 1px 6px rgba(0,80,30,.45);}
+  nav button.on{color:#0a6e30; text-shadow:0 1px 0 rgba(255,255,255,.55), 0 0 12px rgba(57,255,20,.30);}
 
   /* ===== detalle y reproductor ===== */
   .backbtn{display:inline-flex; align-items:center; gap:8px; margin:16px 0 6px; cursor:pointer;
@@ -755,7 +755,46 @@ function bmiCat(b){ if (b == null) return ''; return b < 18.5 ? 'Bajo peso' : b 
 /* ================= ESTADO / NAVEGACIÓN ================= */
 const state = { view:0, routine:0, backTo:0, cat:"TODO" };
 const VIEWS = ['view-home','view-routines','view-exercises','view-run','view-profile'];
-let bubbleAnim = null, bubbleX = null;
+let bubbleX = null, bubbleFlight = null;   // bubbleX = destino confirmado (tx en reposo)
+const B_REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const B_REST = [50,50,50,50,50,50,50,50];
+function bMix(blob, k){ const o=[]; for (let n=0;n<8;n++) o.push(+(blob[n]+(50-blob[n])*k).toFixed(2)); return o; }
+function bStr(r){ return r.slice(0,4).map(v=>v+'%').join(' ')+' / '+r.slice(4).map(v=>v+'%').join(' '); }
+function bStops(fromX, toX){
+  const dir = toX >= fromX ? 1 : -1, dist = Math.abs(toX-fromX);
+  const A = dir>0 ? [56,44,52,48,46,52,48,54] : [44,56,48,52,52,46,54,48];
+  const B = dir>0 ? [46,54,44,56,55,45,58,42] : [54,46,56,44,45,55,42,58];
+  const sxMax = Math.min(1.45, 1 + dist/520);                       // estiramiento según distancia
+  const syMid = Math.max(.72, Math.min(.92, 1/Math.pow(sxMax,.85)));
+  return { dir, stops:[
+    { p:0,   sx:1,     sy:1,     r:B_REST,     dy:0 },
+    { p:.15, sx:1.18,  sy:.82,   r:bMix(A,.3), dy:2 },              // se aplasta al despegar
+    { p:.45, sx:sxMax, sy:syMid, r:A,          dy:0 },              // se estira viajando
+    { p:.72, sx:.90,   sy:1.10,  r:bMix(B,.2), dy:-3 },             // se encoge al llegar
+    { p:.84, sx:1.06,  sy:.94,   r:bMix(A,.55),dy:1.5 },            // gelatina 1
+    { p:.93, sx:.985,  sy:1.015, r:bMix(B,.8), dy:-.5 },            // gelatina 2
+    { p:1,   sx:1,     sy:1,     r:B_REST,     dy:0 }
+  ]};
+}
+function bSample(stops, p){
+  let a = stops[0], b = stops[stops.length-1];
+  for (let s=0;s<stops.length-1;s++){ if (p<=stops[s+1].p){ a=stops[s]; b=stops[s+1]; break; } }
+  const t = b.p===a.p ? 0 : (p-a.p)/(b.p-a.p);
+  const L = (u,v)=>u+(v-u)*t, r = [];
+  for (let n=0;n<8;n++) r.push(L(a.r[n], b.r[n]));
+  return { sx:L(a.sx,b.sx), sy:L(a.sy,b.sy), dy:L(a.dy,b.dy), r };
+}
+function bFrame(bubble, cx, o, sx, sy, dy, r){
+  // cx = centro visual deseado; o = fracción del transform-origin (borde trasero)
+  const tx = cx - o*62*(1-sx) - 31*sx;
+  bubble.style.transform = `translate(${tx.toFixed(2)}px, ${(-31+dy).toFixed(2)}px) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+  bubble.style.borderRadius = bStr(r);
+}
+function bCurrentCenter(now){
+  const f = bubbleFlight; if (!f) return bubbleX===null ? null : bubbleX+31;
+  const p = Math.min(1, (now - f.t0)/f.dur), e = 1 - Math.pow(1-p,3);
+  return f.fromC + (f.toC - f.fromC)*e;
+}
 function moveBubble(i, animate=true){
   const nav = document.getElementById('nav');
   const bubble = document.getElementById('bubble');
@@ -763,37 +802,40 @@ function moveBubble(i, animate=true){
   const b = btns[i]; if (!b) return;
   const x = b.offsetLeft + b.offsetWidth/2 - 31;
   btns.forEach((el,j)=>el.classList.toggle('on', j===i));
-  const fromX = bubbleX;
+  const now = performance.now();
+  const curC = bubbleFlight ? bCurrentCenter(now) : (bubbleX===null ? x+31 : bubbleX+31);
+  if (bubbleFlight){ cancelAnimationFrame(bubbleFlight.raf); bubbleFlight = null; }
+  const settle = ()=>{
+    bubbleX = x; bubbleFlight = null;
+    bubble.style.transformOrigin = '50% 50%';
+    bubble.style.transform = `translate(${x}px,-31px)`;
+    bubble.style.borderRadius = '50%';
+  };
+  if (!animate || B_REDUCED || !window.requestAnimationFrame){ settle(); return; }
+  // FLIP estricto: el destino queda confirmado (bubbleX), pero el fotograma 0
+  // pinta la burbuja en su centro visual actual (curC) e interpolamos el centro
+  // fotograma a fotograma con rAF: el desplazamiento es continuo, nunca salta.
+  const isBloop = Math.abs(curC - (x+31)) < .5;
+  const bs = bStops(curC-31, x);
+  if (isBloop) bs.stops.forEach(s=>{ s.sx = 1+(s.sx-1)*.55; s.sy = 1+(s.sy-1)*.55; s.dy *= .55; });
+  const o = bs.dir > 0 ? 0 : 1;                     // origen en el borde trasero
+  bubble.style.transformOrigin = (o*100)+'% 50%';
   bubbleX = x;
-  if (bubbleAnim){ bubbleAnim.cancel(); bubbleAnim = null; }
-  bubble.style.transition = 'none';
-  bubble.style.transform = `translate(${x}px,-31px)`;
-  if (!animate || fromX === null || !bubble.animate) return;
-  if (fromX === x){
-    // misma pestaña: pequeño "bloop" de gelatina
-    bubbleAnim = bubble.animate([
-      { transform:`translate(${x}px,-31px) scale(1,1)`, borderRadius:'50%' },
-      { transform:`translate(${x}px,-28.5px) scale(1.07,.93)`, borderRadius:'54% 46% 52% 48% / 44% 56% 44% 56%', offset:.35 },
-      { transform:`translate(${x}px,-32.5px) scale(.97,1.04)`, borderRadius:'47% 53% 46% 54% / 55% 45% 55% 45%', offset:.68 },
-      { transform:`translate(${x}px,-31px) scale(1,1)`, borderRadius:'50%' }
-    ], { duration:400, easing:'cubic-bezier(.34,1.35,.44,1)' });
-    return;
-  }
-  const dir = x > fromX ? 1 : -1;
-  const dist = Math.abs(x - fromX);
-  const sx = Math.min(1.36, 1 + dist / 850);   // se estira al viajar
-  const sy = +(Math.max(.72, 1 / sx).toFixed(3));
-  const midX = Math.round((fromX + x) / 2);
-  const BLOB_A = dir > 0 ? '56% 44% 52% 48% / 46% 52% 48% 54%' : '44% 56% 48% 52% / 52% 46% 54% 48%';
-  const BLOB_B = dir > 0 ? '46% 54% 44% 56% / 55% 45% 58% 42%' : '54% 46% 56% 44% / 45% 55% 42% 58%';
-  bubbleAnim = bubble.animate([
-    { transform:`translate(${fromX}px,-31px) scale(1,1)`, borderRadius:'50%' },
-    { transform:`translate(${fromX + dir * 3}px,-29px) scale(1.17,.83)`, borderRadius:BLOB_A, offset:.15, easing:'cubic-bezier(.3,.7,.3,1)' },
-    { transform:`translate(${midX}px,-31px) scale(${sx},${sy})`, borderRadius:BLOB_A, offset:.45 },
-    { transform:`translate(${x + dir * 4}px,-34px) scale(.87,1.13)`, borderRadius:BLOB_B, offset:.72, easing:'cubic-bezier(.3,1.5,.4,1)' },
-    { transform:`translate(${x - dir * 1.5}px,-29.5px) scale(1.05,.95)`, borderRadius:BLOB_A, offset:.86 },
-    { transform:`translate(${x}px,-31px) scale(1,1)`, borderRadius:'50%' }
-  ], { duration:560, easing:'cubic-bezier(.3,.8,.3,1)' });
+  bFrame(bubble, curC, o, 1, 1, 0, B_REST);
+  const f = { t0: now, dur: isBloop ? 400 : 620, fromC: curC, toC: x+31, o, stops: bs.stops, raf: 0 };
+  bubbleFlight = f;
+  const stepFn = (t)=>{
+    if (bubbleFlight !== f) return;
+    const p = Math.min(1, (t - f.t0)/f.dur);
+    const e = 1 - Math.pow(1-p,3);                  // easing de salida suave
+    const cx = f.fromC + (f.toC - f.fromC)*e;
+    const s = bSample(f.stops, p);                  // deformación en la MISMA línea de tiempo
+    bFrame(bubble, cx, f.o, s.sx, s.sy, s.dy, s.r);
+    if (p < 1){ f.raf = requestAnimationFrame(stepFn); }
+    else { bubbleFlight = null; bubble.style.transformOrigin = '50% 50%';
+           bubble.style.transform = `translate(${x}px,-31px)`; bubble.style.borderRadius = '50%'; }
+  };
+  f.raf = requestAnimationFrame(stepFn);
 }
 function show(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
